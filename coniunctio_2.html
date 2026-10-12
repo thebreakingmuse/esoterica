@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONIUNCTIO - The Arcana Portal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
+
+        :root {
+            --bg-deep: #020008;
+            --purple-dark: #1a0033;
+            --indigo: #3b0066;
+            --magenta: #d900b5;
+            --fuchsia-light: #ff66ff;
+            --white-high: #ffffff;
+            --gold-accent: #e6c2ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--white-high);
+            font-family: 'Cormorant Garamond', serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: url('star-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* --- PORTAL VIEW --- */
+        #portal-view {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        #portal-view.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
+        }
+
+        .center-orb {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            border: 2px solid rgba(217, 0, 181, 0.4);
+            box-shadow: 0 0 50px rgba(75, 0, 130, 0.9), inset 0 0 30px rgba(217, 0, 181, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .center-orb::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(from 0deg, transparent 0%, var(--magenta) 25%, transparent 50%, var(--indigo) 75%, transparent 100%);
+            animation: spin 6s linear infinite;
+            mask-image: radial-gradient(circle, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 70%);
+            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 65%);
+            z-index: 1;
+        }
+
+        .center-orb::after {
+            content: '';
+            position: absolute;
+            width: 85%; height: 85%;
+            background: radial-gradient(circle at center, rgba(2, 0, 8, 0.9) 30%, rgba(26, 0, 51, 0.8) 100%);
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .center-text {
+            position: relative;
+            z-index: 5;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--fuchsia-light);
+            text-shadow: 0 0 15px var(--magenta);
+            letter-spacing: 2px;
+            padding: 30px;
+        }
+
+        .connection-line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 280px; 
+            height: 0;
+            border-top: 2px dashed rgba(217, 0, 181, 0.6);
+            transform-origin: 0 0; 
+            z-index: 2; 
+            pointer-events: none;
+            filter: drop-shadow(0 0 6px var(--magenta));
+            animation: line-fade-in 1s ease forwards;
+        }
+
+        @keyframes line-fade-in {
+            0% { opacity: 0; width: 0px; }
+            100% { opacity: 1; width: 280px; }
+        }
+
+        .branch-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: top left;
+            z-index: 5;
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            animation: fade-in 1.5s ease forwards;
+        }
+        
+        @keyframes fade-in {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .branch-node {
+            position: absolute;
+            border-radius: 50% 50% 10px 10px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(217, 0, 181, 0.4);
+            border: 2px solid rgba(217, 0, 181, 0.7);
+            width: 100px;
+            height: 140px;
+            background: var(--purple-dark);
+            transform: translate(-50%, -50%); 
+            transition: all 0.4s ease;
+        }
+
+        .branch-node img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+            pointer-events: none;
+        }
+
+        .branch-label {
+            position: absolute;
+            top: 85px; 
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Cinzel', serif;
+            color: var(--white-high);
+            background: rgba(2, 0, 8, 0.8);
+            border: 1px solid rgba(217, 0, 181, 0.5);
+            box-shadow: 0 0 15px rgba(217, 0, 181, 0.4);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            white-space: nowrap;
+            transition: all 0.4s ease;
+            pointer-events: none; 
+            backdrop-filter: blur(4px);
+        }
+
+        .branch-node:hover {
+            box-shadow: 0 0 40px var(--fuchsia-light);
+            border-color: var(--white-high);
+            transform: translate(-50%, -60%) scale(1.15); 
+            z-index: 20;
+        }
+        .branch-node:hover img { transform: scale(1.15); }
+        .branch-node:hover + .branch-label { 
+            box-shadow: 0 0 20px var(--fuchsia-light);
+            border-color: var(--white-high);
+            transform: translate(-50%, 5px); 
+        }
+
+        /* --- GALLERY VIEW --- */
+        #gallery-view {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(2, 0, 8, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            overflow-y: auto;
+            padding: 40px 20px;
+        }
+        #gallery-view.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .gallery-header {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        .gallery-title {
+            font-family: 'Cinzel', serif;
+            color: var(--white-high);
+            text-shadow: 0 0 20px var(--magenta);
+            font-size: 2rem;
+            letter-spacing: 4px;
+        }
+
+        .back-btn {
+            font-family: 'Cinzel', serif;
+            color: var(--gold-accent);
+            background: none;
+            border: 1px solid var(--magenta);
+            padding: 10px 20px;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+        .back-btn:hover {
+            background: rgba(217, 0, 181, 0.2);
+            color: var(--white-high);
+            box-shadow: 0 0 15px var(--magenta);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+
+        .gallery-grid img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--indigo);
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .gallery-grid img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--fuchsia-light);
+            border-color: var(--fuchsia-light);
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MAIN PORTAL -->
+    <div id="portal-view">
+        <div class="center-orb">
+            <p class="center-text">Coniunctio<br>The Arcana Portal</p>
+        </div>
+    </div>
+
+    <!-- GALLERY VIEW -->
+    <div id="gallery-view">
+        <div class="gallery-header">
+            <h1 class="gallery-title" id="gallery-title">Branch Name</h1>
+            <button class="back-btn" onclick="closeGallery()">✦ R E T U R N</button>
+        </div>
+        <div class="gallery-grid" id="gallery-grid">
+            <!-- Images will inject here -->
+        </div>
+    </div>
+
+    <script>
+        const portalView = document.getElementById('portal-view');
+        const galleryView = document.getElementById('gallery-view');
+        const galleryTitle = document.getElementById('gallery-title');
+        const galleryGrid = document.getElementById('gallery-grid');
+        
+        let branchesData = [];
+        const orbitRadius = 280; 
+
+        // Fetch the branches JSON dynamically generated by the Python script
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('branches.json')
+                .then(response => {
+                    if (!response.ok) throw new Error("No branches.json found");
+                    return response.json();
+                })
+                .then(data => {
+                    branchesData = data;
+                    renderBranches();
+                })
+                .catch(err => {
+                    console.log("No portals manifested yet. Awaiting Python script execution.");
+                });
+        });
+
+        function renderBranches() {
+            const total = branchesData.length;
+            
+            branchesData.forEach((branch, index) => {
+                const angle = (index / total) * (Math.PI * 2) - (Math.PI / 2);
+                
+                const x = Math.cos(angle) * orbitRadius;
+                const y = Math.sin(angle) * orbitRadius;
+
+                const line = document.createElement('div');
+                line.className = 'connection-line';
+                line.style.transform = `rotate(${angle}rad)`;
+                portalView.appendChild(line);
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'branch-wrapper';
+                
+                // Add a slight delay cascade based on index for a cool load-in effect
+                wrapper.style.animationDelay = `${index * 0.15}s`;
+                line.style.animationDelay = `${index * 0.15}s`;
+                
+                // We use standard CSS variables for exact positioning to work with the animation
+                wrapper.style.left = `calc(50% + ${x}px)`;
+                wrapper.style.top = `calc(50% + ${y}px)`;
+
+                const node = document.createElement('div');
+                node.className = 'branch-node';
+                node.onclick = () => openGallery(branch.id);
+                
+                const sigilImg = document.createElement('img');
+                sigilImg.src = branch.thumbnail;
+                sigilImg.alt = branch.name + " portal";
+                
+                const label = document.createElement('div');
+                label.className = 'branch-label';
+                label.innerText = branch.name;
+
+                node.appendChild(sigilImg);
+                wrapper.appendChild(node);
+                wrapper.appendChild(label);
+                
+                portalView.appendChild(wrapper);
+            });
+        }
+
+        function openGallery(branchId) {
+            const branch = branchesData.find(b => b.id === branchId);
+            if (!branch) return;
+
+            galleryTitle.innerText = branch.name;
+            galleryGrid.innerHTML = '';
+
+            branch.images.forEach(imgUrl => {
+                const imgEl = document.createElement('img');
+                imgEl.src = imgUrl;
+                galleryGrid.appendChild(imgEl);
+            });
+
+            portalView.classList.add('hidden');
+            setTimeout(() => {
+                portalView.style.display = 'none';
+                galleryView.style.display = 'flex';
+                setTimeout(() => galleryView.classList.add('active'), 20);
+            }, 500); 
+        }
+
+        function closeGallery() {
+            galleryView.classList.remove('active');
+            
+            setTimeout(() => {
+                galleryView.style.display = 'none';
+                portalView.style.display = 'flex';
+                setTimeout(() => portalView.classList.remove('hidden'), 20);
+            }, 500);
+        }
+    </script>
+</body>
+</html>
