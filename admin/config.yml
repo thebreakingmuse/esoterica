@@ -1,0 +1,24 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "portals/uploads"
+public_folder: "portals/uploads"
+
+collections:
+  - name: "database"
+    label: "Portal Database"
+    files:
+      - label: "Branches Manifest"
+        name: "branches"
+        file: "branches.json"
+        format: json
+        fields:
+          - label: "Portal Branches"
+            name: "portals"
+            widget: "list"
+            fields:
+              - {label: "ID (e.g., 171234)", name: "id", widget: "string"}
+              - {label: "Portal Name", name: "name", widget: "string"}
+              - {label: "Thumbnail", name: "thumbnail", widget: "select", options: ["01-hexagonal-gate.webp", "02-lunar-oracle.webp", "03-metatron-bloom.webp", "04-alchemical-conjunction.webp", "05-eightfold-compass.webp", "06-vesica-tide.webp", "07-triple-ouroboros.webp", "08-black-sun-mandala.webp"]}
+              - {label: "Gallery Images", name: "images", widget: "list", field: {label: "Image", name: "image", widget: "image"}}
