@@ -75,14 +75,20 @@ def main():
 
     print(f"\nBranch '{branch_name}' manifested locally with {len(image_urls)} images.")
     
-    # Optional: Automate the Netlify Deploy via Git
+   # Optional: Automate the Netlify Deploy via Git
+    time.sleep(1) # Give the OS a second to finish writing the files
     push = input("\nPush to GitHub/Netlify now? (y/n): ").strip().lower()
     if push == 'y':
         print("Committing and pushing...")
-        subprocess.run(["git", "add", "."])
-        subprocess.run(["git", "commit", "-m", f"Manifested new portal: {branch_name}"])
-        subprocess.run(["git", "push"])
+        subprocess.run(["git", "add", "."], cwd=BASE_DIR)
+        subprocess.run(["git", "commit", "-m", f"Manifested new portal: {branch_name}"], cwd=BASE_DIR)
+        subprocess.run(["git", "push"], cwd=BASE_DIR)
         print("Push complete. Netlify is building.")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"\nCRASH ERROR: {e}")
+    
+    input("\nPress Enter to close this window...")
